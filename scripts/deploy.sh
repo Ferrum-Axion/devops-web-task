@@ -14,7 +14,7 @@
 PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 MY_SITE="$PROJECT_ROOT/site"
-MY_CONFIG="$PROJECT_ROOT/nginx/devops-site"
+MY_CONFIG="$PROJECT_ROOT/nginx/site.conf"
 
 SITE_DEST="/var/www/devops-site"
 CONFIG_DEST="/etc/nginx/sites-available/devops-site"
@@ -40,6 +40,14 @@ echo "Updating Config..."
 if sudo cp "$MY_CONFIG" "$CONFIG_DEST";
 then
     echo "Successfuly updated config!"
+    echo "Updating config in site available..."
+    if sudo ln -sf "$CONFIG_DEST" "/etc/nginx/sites-enabled/devops-site"
+    then 
+        echo "Succesuly updated config in sites-availble!"
+    else
+        echo "Something went wrong"
+        exit 1
+    fi
 else
     echo "Something went wrong"
     exit 1
@@ -47,6 +55,8 @@ fi
 
 
 #Step 3
+echo "Verifying nginx id correct..." 
+echo "Output:"
 if sudo nginx -t;
 then
     echo "Nginx configuration is correct! Restarting Ngnix..."
