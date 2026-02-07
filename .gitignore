@@ -1,4 +1,4 @@
 *.tar.gz
 *.log
 nginx/*.log
-
+*.swp
