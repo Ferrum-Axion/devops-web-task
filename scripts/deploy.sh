@@ -35,13 +35,16 @@ fi
 
 
 #Step2
-echo "Updating Config..."
+echo "Updating NGINX Config..."
 
-if sudo cp "$MY_CONFIG" "$CONFIG_DEST";
+MY_SSL_CONFIG="$PROJECT_ROOT/nginx/site-ssl.conf"
+SSL_CONFIG_DEST="/etc/nginx/sites-available/devops-site-ssl"
+
+if sudo cp "$MY_CONFIG" "$CONFIG_DEST" && sudo cp "$MY_SSL_CONFIG" "$SSL_CONFIG_DEST";
 then
     echo "Successfuly updated config!"
-    echo "Updating config in site available..."
-    if sudo ln -sf "$CONFIG_DEST" "/etc/nginx/sites-enabled/devops-site"
+    echo "Creating symbolic links..."
+    if sudo ln -sf "$CONFIG_DEST" "/etc/nginx/sites-enabled/devops-site" && sudo ln -sf "$SSL_CONFIG_DEST" "/etc/nginx/sites-enabled/devops-site-ssl";
     then 
         echo "Succesuly updated config in sites-availble!"
     else
