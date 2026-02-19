@@ -55,3 +55,5 @@ main() {
     check_cert_dir
     generate_ssl_certificate
 }
+
+main

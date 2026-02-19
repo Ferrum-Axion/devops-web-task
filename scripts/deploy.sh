@@ -16,7 +16,7 @@ PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 WEB_DIR=/var/www/devops-site
 VERSION=$(date +"%d.%m.%Y - %H:%M:%S") 
 
-# Check if the the script is run as root
+# Check if the script is run as root
 run_as_root() {
     if [[ $EUID -ne 0 ]];
     then
@@ -94,3 +94,5 @@ main() {
     restart_nginx
     print_version_complete
 }
+
+main
