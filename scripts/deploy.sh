@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ################################
 # Developer: Liad Binyamin
-# Purpose:  
+# Purpose: Deploy the web server with the latest site content and nginx configuration 
 # Version: 0.0.3
 # Date: 10.2.26
 set -o errexit

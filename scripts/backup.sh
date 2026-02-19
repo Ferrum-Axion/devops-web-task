@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ################################
 # Developer: Liad Binyamin
-# Purpose:  
+# Purpose: Backup the current state of the web server
 # Version: 0.0.1
 # Date: 14.2.26
 set -o errexit

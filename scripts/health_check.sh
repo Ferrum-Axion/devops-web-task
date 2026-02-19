@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ################################
 # Developer: Liad Binyamin
-# Purpose:  
+# Purpose: Health check script to verify that the web server is running 
 # Version: 0.0.1
 # Date: 10.2.26
 set -o errexit
