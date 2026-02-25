@@ -5,71 +5,68 @@
 # Created by: Elena Kuznetsov
 # Purpose: Site and config deployment
 # Version: 0.0.1
-# Date: 2/2/2026
+# Date: 25.2.26
 #
 ###################
-#
-#
-#
-PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
+set -euo pipefail
+
+PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 MY_SITE="$PROJECT_ROOT/site"
 MY_CONFIG="$PROJECT_ROOT/nginx/site.conf"
+MY_SSL_CONFIG="$PROJECT_ROOT/nginx/site-ssl.conf"
 
 SITE_DEST="/var/www/devops-site"
 CONFIG_DEST="/etc/nginx/sites-available/devops-site"
+SSL_CONFIG_DEST="/etc/nginx/sites-available/devops-site-ssl"
+
+check_if_root() {
+    if [[ $EUID -ne 0 ]];
+    then
+        echo "Error: This script must be run as root. Try: sudo $0"
+        exit 1
+    fi
+}
+
+deploy_files() {
+    echo "Copying files to $SITE_DEST..."
+    mkdir -p "$SITE_DEST"
+    cp -r "$MY_SITE/"* "$SITE_DEST"
+}
+
+update_configs() {
+    echo "Updating NGINX Config with dynamic paths..."
+    cp "$MY_CONFIG" "$CONFIG_DEST"
+
+    sed -e "s|{{CERT}}|/etc/nginx/ssl/nginx-selfsigned.crt|g" \
+        -e "s|{{KEY}}|/etc/nginx/ssl/nginx-selfsigned.key|g" \
+        -e "s|{{ROOT}}|$SITE_DEST|g" \
+        "$MY_SSL_CONFIG" > "$SSL_CONFIG_DEST"
+
+    ln -sf "$CONFIG_DEST" "/etc/nginx/sites-enabled/devops-site"
+    ln -sf "$SSL_CONFIG_DEST" "/etc/nginx/sites-enabled/devops-site-ssl"
+}
+
+restart_nginx() {
+    if nginx -t;
+    then
+        systemctl reload nginx
+        return 0
+    else
+        return 1
+    fi
+}
+
+
+check_if_root
 
 echo "Starting Deploy..."
 
-
-#Step 1
-echo "Copying files from $MY_SITE to $SITE_DEST..." 
-if sudo cp -r "$MY_SITE/"* "$SITE_DEST";
-then 
-    echo "Successfuly copied the files!"
-else
-    echo "Something went wrong"
-    exit 1
-fi
-
-
-
-#Step2
-echo "Updating NGINX Config..."
-
-MY_SSL_CONFIG="$PROJECT_ROOT/nginx/site-ssl.conf"
-SSL_CONFIG_DEST="/etc/nginx/sites-available/devops-site-ssl"
-
-if sudo cp "$MY_CONFIG" "$CONFIG_DEST" && sudo cp "$MY_SSL_CONFIG" "$SSL_CONFIG_DEST";
+if deploy_files && update_configs && restart_nginx;
 then
-    echo "Successfuly updated config!"
-    echo "Creating symbolic links..."
-    if sudo ln -sf "$CONFIG_DEST" "/etc/nginx/sites-enabled/devops-site" && sudo ln -sf "$SSL_CONFIG_DEST" "/etc/nginx/sites-enabled/devops-site-ssl";
-    then 
-        echo "Succesuly updated config in sites-availble!"
-    else
-        echo "Something went wrong"
-        exit 1
-    fi
-else
-    echo "Something went wrong"
-    exit 1
-fi
-
-
-#Step 3
-echo "Verifying nginx id correct..." 
-echo "Output:"
-if sudo nginx -t;
-then
-    echo "Nginx configuration is correct! Restarting Ngnix..."
-    sudo systemctl reload nginx
     echo "Success!"
-    
     exit 0
 else
-    echo "ERROR: something went wrong:\("
-
+    echo "Deployment failed!"
     exit 1
 fi
-
