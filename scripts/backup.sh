@@ -22,6 +22,7 @@ runs_as_root() {
         exit 1
     fi
 }
+##### ==>> function are suppose to return exit codes, strings can be in main function ... GREAT WORK !!!
 
 # Creates a backup directory and sets the correct permissions for the webdeploy user
 setup_backup_directory() {
