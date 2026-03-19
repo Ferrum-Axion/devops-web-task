@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Generate a self-signed SSL certificate for devops-site. Run from repo root.
 # Usage: ./scripts/ssl_selfsign.sh [output-dir]
-
+##### ==>> almost none of the things suggest during the shell programming lessons are here: it works, barely... 75
 set -e
 
 OUTPUT_DIR="${1:-nginx}"
